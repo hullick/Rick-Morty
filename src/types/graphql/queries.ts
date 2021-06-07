@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 
-export const GET_PAGINATED_FILTERED_CHARACTERS = gql`
+export const GET_CHARACTERS = gql`
   query ($page: Int!, $filter: FilterCharacter) {
     characters(page: $page, filter: $filter) {
       info {

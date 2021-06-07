@@ -7,14 +7,14 @@ export interface FilterCharacter {
 }
 
 export enum CharacterStatus {
-  ALIVE,
-  DEAD,
-  UNKNOWN,
+  ALIVE = "Alive",
+  DEAD = "Dead",
+  UNKNOWN = "Unknown",
 }
 
 export enum CharacterGender {
-  MALE,
-  FEMALE,
-  GENDERLESS,
-  UNKNOWN,
+  MALE = "Male",
+  FEMALE = "Female",
+  GENDERLESS = "Genderless",
+  UNKNOWN = "Unknown",
 }

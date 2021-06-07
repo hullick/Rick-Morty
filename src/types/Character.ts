@@ -1,3 +1,5 @@
+import Episode from "./Episode";
+
 interface Character {
     foto: string;
     characterId: number,
@@ -5,7 +7,7 @@ interface Character {
     name: string,
     gender: string,
     species: string,
-    lastEpisode: string
+    lastEpisode: Episode
 }
 
 export default Character
