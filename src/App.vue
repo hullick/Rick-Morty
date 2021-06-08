@@ -27,19 +27,19 @@ export default defineComponent({
   name: 'App',
   components: {TableList},
   setup(){
-    const characters = ref<Character[]>([
-      {identifier:1,foto:'eqwe',characterId: 1, name: 'Rui', gender: 'Male', species: '2', lastEpisode:'ws23'},
-      {identifier:2,foto:'eqwe',characterId: 2, name: 'Jorge', gender: 'Male', species: '2', lastEpisode:'ws24'},
-      {identifier:3,foto:'eqwe',characterId: 3, name: 'Raul', gender: 'Male', species: '2', lastEpisode:'ws25'},
-      {identifier:4,foto:'eqwe',characterId: 4, name: 'Morty', gender: 'Male', species: '2', lastEpisode:'ws21'},
-    ])
+    // const characters = ref<Character[]>([
+    //   {identifier:1,foto:'eqwe',characterId: 1, name: 'Rui', gender: 'Male', species: '2', lastEpisode:'ws23'},
+    //   {identifier:2,foto:'eqwe',characterId: 2, name: 'Jorge', gender: 'Male', species: '2', lastEpisode:'ws24'},
+    //   {identifier:3,foto:'eqwe',characterId: 3, name: 'Raul', gender: 'Male', species: '2', lastEpisode:'ws25'},
+    //   {identifier:4,foto:'eqwe',characterId: 4, name: 'Morty', gender: 'Male', species: '2', lastEpisode:'ws21'},
+    // ])
 
     const order =ref<OrderTerm>('name')
 
     const handleClick = (term: OrderTerm) => {
        order.value = term
     }
-    return {characters,handleClick, order}
+    return {handleClick, order}
   }
 })
 </script>

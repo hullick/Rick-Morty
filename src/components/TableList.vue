@@ -1,70 +1,129 @@
 <template>
   <div class="table-list">
-    <p>Ordered by {{order}}</p>
+    <p>Ordered by {{ order }}</p>
     <ul class="menu-options">
-        <li><a class="link" href="#">All Characters</a></li>
-        <li><a class="link" href="#">Favorites</a></li>
+      <li><a class="link" href="#">All Characters</a></li>
+      <li><a class="link" href="#">Favorites</a></li>
     </ul>
+
     <table class="table">
-        <thead>
-            <tr>
-                <th>Photo</th>
-                <th>Character Id</th>
-                <th>Name</th>
-                <th>Gender</th>
-                <th>Species</th>
-                <th>Last Episode</th>
-                <th>Add to Favorites</th>
-            </tr>
-        </thead>
-        <tbody>
-        <tr v-for="character in orderedCharacter" :key="character.characterId">
-            <td>{{character.foto}}</td>
-            <td>{{character.characterId}}</td>
-            <td>{{character.name}}</td>
-            <td>{{character.gender}}</td>
-            <td>{{character.species}}</td>
-            <td>{{character.lastEpisode}}</td>
-            <td><button class="button btn-primary btn-sm btn-success" type="button"><span class="material-icons">favorite</span></button></td>
-        </tr>    
-        </tbody> 
+      <thead>
+        <tr>
+          <th
+            v-for="characterField in charactersFieldsList"
+            :key="characterField"
+            v-html="getDisplayOfField(characterField)"
+          ></th>
+          <th>Add to Favorites</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="character in characters" :key="character.characterId">
+          <td
+            v-for="characterField in charactersFieldsList"
+            :key="characterField"
+            v-html="getHTMLElementOfField(characterField, character)"
+          ></td>
+          <td>
+            <button class="button btn-primary btn-sm btn-success" type="button">
+              <span class="material-icons">favorite</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
     </table>
+    <character-photo style="display: none" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed } from "vue";
+import { defineComponent, h, render } from "vue";
+import { useQuery, useQueryLoading } from "@vue/apollo-composable";
+import { GET_CHARACTERS } from "@/types/graphql/queries";
+import CharacterFactory from "@/factories/CharacterFactory";
+import DisplayTypeFieldHelper from "@/helpers/DisplayTypeFieldHelper";
 import Character from "@/types/Character";
-import OrderTerm from "@/types/OrderTerm";
-// import Character from "@/types/Character";
+import CharacterPhoto from "./CharacterPhoto.vue";
 
 export default defineComponent({
-    props:{
-        characters:{ 
-            required: true,
-            type: Array as PropType<Character[]> 
-        },
-        order:{ 
-          required: true,
-          type: String as PropType<OrderTerm>
-        }
+  components: { CharacterPhoto },
+  computed: {
+    characters(): any {
+      return this["charactersQuery"]
+        ? this["charactersQuery"].characters.results.map((value: any) => {
+            return CharacterFactory.getCharacterInstanceFrom(value);
+          })
+        : [];
     },
-    setup(props){
-      const orderedCharacter = computed(() =>{
-        return [...props.characters].sort((a: Character, b: Character) => {
-          return a[props.order] > b[props.order] ? 1 : -1;
-        })
-      })
+  },
+  data() {
+    return {
+      charactersFieldsList:
+        process.env.VUE_APP_CHARACTERS_FIELDS_LIST.split("|"),
+    };
+  },
+  watch: {
+    charactersQuery: function (currValue) {
+      this.characters = this.charactersQuery.results;
+    },
+  },
+  methods: {
+    getDisplayOfField(field: string) {
+      return DisplayTypeFieldHelper.getCharacterFieldDisplay(field);
+    },
+    getHTMLElementOfField(field: string, character: Character): any {
+      const MyLink = {
+        functional: true,
+        name: "my-link",
+        props: { url: String },
+        render(createElement: any, context: any) {
+          let { url } = context.props;
+          let slots = context.slots();
+          if (url) {
+            return createElement(
+              "a",
+              {
+                attrs: { href: url },
+              },
+              slots.default
+            );
+          } else {
+            return slots.default;
+          }
+        },
+      };
+      switch (field) {
+        case "foto":
+          return `<component :is='CharacterPhoto'/>`;
+        case "episode":
+          return character.lastEpisode.name;
+        case "name":
+          return character.name;
+        case "characterId":
+          return character.characterId;
+        case "gender":
+          return character.gender;
+        case "species":
+          return character.species;
+      }
+    },
+  },
+  setup(props) {
+    const query = useQuery(GET_CHARACTERS, {
+      page: 0,
+    });
 
-      return{ orderedCharacter}
-    }
-})
+    const { result: charactersQuery } = query;
+
+    const loading = useQueryLoading();
+
+    return { charactersQuery, loading };
+  },
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
-
 h3 {
   margin: 40px 0 0;
 }
@@ -80,32 +139,32 @@ a {
   color: #42b983;
 }
 
-thead{
-background: rgba(229, 234, 244, 0.25);
-border-style: none;
+thead {
+  background: rgba(229, 234, 244, 0.25);
+  border-style: none;
 }
 
-thead th{
-      color: #A9B1BD;
-      font-style: normal;
-      font-weight: 500;
+thead th {
+  color: #a9b1bd;
+  font-style: normal;
+  font-weight: 500;
 }
 
-td{
-    color: #A9B1BD;
-    font-style: normal;
-    font-weight: 500;
+td {
+  color: #a9b1bd;
+  font-style: normal;
+  font-weight: 500;
 }
 
-body{
- margin: 0;
+body {
+  margin: 0;
 }
 
-.table-list{
-    text-align: center;
+.table-list {
+  text-align: center;
 }
 
-.menu-options{
-    display: flex;
+.menu-options {
+  display: flex;
 }
 </style>
